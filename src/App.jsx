@@ -2,8 +2,7 @@ import React, {useEffect, useState} from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import { checkIfWalletIsConnected,connectWallet } from './solanaConfig'
-import idl from './idl/solanatestproject.json'
-
+import { getGifList, createGifAccount } from './gifUtils'
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -29,6 +28,10 @@ const App = () => {
 	const onInputChange= (event)=> {
 		setInputValue(event.target.value)
 	}
+	const fetchGisfs = async ()=> {
+		const gifs = await getGifList()
+		setGifList(gifs)
+	}
 	const sendGif = async (gifLink) => {
   if (gifLink && gifLink.trim().length > 0) {
     console.log('Gif link:',gifLink );
@@ -39,10 +42,20 @@ const App = () => {
   }
 }
 	const ConnectedContainer = () => (
-  <div className="connected-container">
+  <>
+		{gifList === null ? (
+			<div className="connected-container">
+        <button className="cta-button submit-gif-button" onClick={createGifAccount}>
+          create your gif account
+        </button>
+      </div>
+		)
+		:
+		(
+			<div className="connected-container">
     <form
       onSubmit={(event) => {
-        // event.preventDefault();
+        event.preventDefault();
 				sendGif(inputValue)
       }}
     >
@@ -62,6 +75,8 @@ const App = () => {
       ))}
     </div>
   </div>
+		)}
+	</>
 );
 
 	useEffect(()=> {
@@ -78,7 +93,7 @@ const App = () => {
     console.log('Fetching GIF list...');
     
     // Call Solana program here.
-
+	fetchGisfs()
     // Set state
   }
 }, [walletAddress]);

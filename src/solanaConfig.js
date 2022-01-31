@@ -1,3 +1,14 @@
+
+import {  Provider } from '@project-serum/anchor';
+import { Connection,clusterApiUrl  } from '@solana/web3.js';
+
+const NETWORK = clusterApiUrl('devnet');
+
+const opts = {
+  preflightCommitment: "processed"
+}
+
+
 export async function checkIfWalletIsConnected(){
 	try {
 		return connectWallet()
@@ -15,4 +26,12 @@ export async function connectWallet(){
 		} else {
 			alert('Solana object not found! Get a Phantom Wallet 👻');
 		}
+}
+
+export const getProvider = () => {
+  const connection = new Connection(NETWORK, opts.preflightCommitment);
+  const provider = new Provider(
+    connection, window.solana, opts.preflightCommitment,
+  );
+	return provider;
 }
