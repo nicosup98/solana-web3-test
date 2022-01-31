@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
 import { checkIfWalletIsConnected,connectWallet } from './solanaConfig'
+import idl from './idl/solanatestproject.json'
 
 // Constants
 const TWITTER_HANDLE = '_buildspace';
@@ -13,12 +14,12 @@ const TEST_GIFS = [
 	'https://i.giphy.com/media/PAqjdPkJLDsmBRSYUp/giphy.webp'
 ]
 const App = () => {
-	const [walletAdress,setWaletAdress] = useState(null)
+	const [walletAddress,setWalletAddress] = useState(null)
 	const [inputValue, setInputValue] = useState('');
 	const [gifList, setGifList] = useState([]);
 	const connect = async ()=> {
 		const wallet = await connectWallet()
-		setWaletAdress(wallet)
+		setWalletAddress(wallet)
 	}
 	const NotConnectedContainer = ()=> (
 		<button className="cta-button connect-wallet-button" onClick={connect}>
@@ -31,16 +32,17 @@ const App = () => {
 	const sendGif = async (gifLink) => {
   if (gifLink && gifLink.trim().length > 0) {
     console.log('Gif link:',gifLink );
+		setGifList(pv=> [...pv,gifLink])
+		setInputValue('');
   } else {
     console.log('Empty input. Try again.');
   }
 }
 	const ConnectedContainer = () => (
   <div className="connected-container">
-    {/* Go ahead and add this input and button to start */}
     <form
       onSubmit={(event) => {
-        event.preventDefault();
+        // event.preventDefault();
 				sendGif(inputValue)
       }}
     >
@@ -65,7 +67,7 @@ const App = () => {
 	useEffect(()=> {
 		const onload = async () => {
 		const connection =await checkIfWalletIsConnected()
-		useWalletAdress(connection)
+		setWalletAddress(connection)
 	}
 	 	window.addEventListener('load', onload);
 		return () => window.removeEventListener('load', onLoad);
@@ -78,18 +80,17 @@ const App = () => {
     // Call Solana program here.
 
     // Set state
-    setGifList(TEST_GIFS);
   }
 }, [walletAddress]);
   return (
     <div className="App">
-      <div className={walletAdress? 'authed-container' : 'container'}>
+      <div className={walletAddress? 'authed-container' : 'container'}>
         <div className="header-container">
           <p className="header">🖼 GIF Portal</p>
           <p className="sub-text">
             View your GIF collection in the metaverse ✨
           </p>
-					{walletAdress ? <ConnectedContainer /> : <NotConnectedContainer />}
+					{walletAddress ? <ConnectedContainer /> : <NotConnectedContainer />}
         </div>
         <div className="footer-container">
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
