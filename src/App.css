@@ -128,3 +128,7 @@
 .connected-container button {
   height: 50px;
 }
+
+.warn-text {
+	color: yellow
+}

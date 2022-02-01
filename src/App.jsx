@@ -102,6 +102,7 @@ const App = () => {
           <p className="sub-text">
             View your GIF collection in the metaverse ✨
           </p>
+					<p className="warn-text">make shure you are in the devnet</p>
 					{walletAddress ? <ConnectedContainer /> : <NotConnectedContainer />}
         </div>
         <div className="footer-container">
