@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import twitterLogo from './assets/twitter-logo.svg';
 import './App.css';
-import { checkIfWalletIsConnected,connectWallet } from './solanaConfig'
-import { getGifList, createGifAccount } from './gifUtils'
+import { connectWallet } from './solanaConfig'
+import { getGifList, createGifAccount, sendGif } from './gifUtils'
 // Constants
 const TWITTER_HANDLE = '_buildspace';
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -30,12 +30,18 @@ const App = () => {
 	}
 	const fetchGisfs = async ()=> {
 		const gifs = await getGifList()
+		console.log({gifs})
 		setGifList(gifs)
 	}
-	const sendGif = async (gifLink) => {
+	const handleCreateGifAccount = async ()=>{
+		const gifs = await createGifAccount()
+		setGifList(gifs)
+	}
+	const handleSendGif = async (gifLink) => {
   if (gifLink && gifLink.trim().length > 0) {
     console.log('Gif link:',gifLink );
-		setGifList(pv=> [...pv,gifLink])
+		const gifs = await sendGif(gifLink)
+		setGifList(gifs)
 		setInputValue('');
   } else {
     console.log('Empty input. Try again.');
@@ -45,7 +51,7 @@ const App = () => {
   <>
 		{gifList === null ? (
 			<div className="connected-container">
-        <button className="cta-button submit-gif-button" onClick={createGifAccount}>
+        <button className="cta-button submit-gif-button" onClick={handleCreateGifAccount}>
           create your gif account
         </button>
       </div>
@@ -56,21 +62,20 @@ const App = () => {
     <form
       onSubmit={(event) => {
         event.preventDefault();
-				sendGif(inputValue)
+				handleSendGif(inputValue)
       }}
     >
       <input 
 				type="text" 
 				value={inputValue} 
-				placeholder="Enter gif link!" 
 				onChange={onInputChange} 
 				placeholder="Enter gif link!" />
       <button type="submit" className="cta-button submit-gif-button">Submit</button>
     </form>
     <div className="gif-grid">
-      {gifList.map((gif) => (
-        <div className="gif-item" key={gif}>
-          <img src={gif} alt={gif} />
+      {gifList.map((gif,i) => (
+        <div className="gif-item" key={i}>
+          <img src={gif.gifLink} alt={gif.gifLink} />
         </div>
       ))}
     </div>
@@ -79,14 +84,6 @@ const App = () => {
 	</>
 );
 
-	useEffect(()=> {
-		const onload = async () => {
-		const connection =await checkIfWalletIsConnected()
-		setWalletAddress(connection)
-	}
-	 	window.addEventListener('load', onload);
-		return () => window.removeEventListener('load', onLoad);
-	}, [])
 
 	useEffect(() => {
   if (walletAddress) {
